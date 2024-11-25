@@ -1,21 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../App.css'
 
 const ReportarAnimal = () => {
   const [datosAnimal, setDatosAnimal] = useState({
     nombre: '',
+    tipo: '',
+    raza: '',
     ubicacion: '',
     estadoSalud: '',
   });
 
   const [error, setError] = useState(null);
 
+  const obtenerAnimales = () => {
+    const listaDeAnimales = JSON.parse(window.localStorage.getItem("reporte")) || []
+    return listaDeAnimales
+  };
+
+
+  const persistirDatos = (animal) => {
+    const listaActualAnimales = obtenerAnimales()
+
+    window.localStorage.setItem("reporte", JSON.stringify([...listaActualAnimales, animal]));
+  }
+
   const manejarCambio = (e) => {
     setDatosAnimal({ ...datosAnimal, [e.target.name]: e.target.value });
   };
 
   const validarDatos = () => {
-    if (!datosAnimal.nombre || !datosAnimal.ubicacion || !datosAnimal.estadoSalud) {
+    if (!datosAnimal.nombre || !datosAnimal.raza || !datosAnimal.tipo || !datosAnimal.ubicacion || !datosAnimal.estadoSalud) {
       setError('Todos los campos son obligatorios');
       return false;
     }
@@ -28,9 +42,12 @@ const ReportarAnimal = () => {
     if (!validarDatos()) return;
 
     try {
+      persistirDatos(datosAnimal)
       alert('Animal reportado con éxito');
-      setDatosAnimal({ nombre: '', ubicacion: '', estadoSalud: '' });
+      
+      setDatosAnimal({ nombre: '', tipo: '', raza: '', ubicacion: '', estadoSalud: '' });
     } catch (error) {
+      console.log(error);
       setError('Ocurrió un error al reportar el animal');
     }
   };
@@ -44,6 +61,21 @@ const ReportarAnimal = () => {
         name="nombre"
         placeholder="Nombre del animal"
         value={datosAnimal.nombre}
+        onChange={manejarCambio}
+      />
+      <select 
+        name="tipo"
+        onChange={manejarCambio}
+        value={datosAnimal.tipo}>
+        <option value="">Selecciona tipo de animal</option>
+        <option value="gato">gato</option>
+        <option value="perro">perro</option>
+      </select>
+       <input
+        type="text"
+        name="raza"
+        placeholder="Raza del animal"
+        value={datosAnimal.raza}
         onChange={manejarCambio}
       />
       <input

@@ -13,7 +13,8 @@ const PerfilAnimal = () => {
 
   useEffect(() => {
     const obtenerAnimales = async () => {
-      // Aquí iría la lógica para obtener los animales
+      const listaDeAnimales = JSON.parse(window.localStorage.getItem("reporte"))
+      setAnimales(listaDeAnimales)
     };
     obtenerAnimales();
   }, []);
@@ -30,59 +31,39 @@ const PerfilAnimal = () => {
     setOrdenar(e.target.value);
   };
 
-  const animalesFiltrados = animales
-    .filter(animal => {
-      const coincideBusqueda = animal.name.toLowerCase().includes(busqueda.toLowerCase());
-      const coincideUbicacion = filtro.ubicacion ? animal.location === filtro.ubicacion : true;
-      const coincideTipo = filtro.tipo ? animal.type === filtro.tipo : true;
-      const coincideEdad = filtro.edad ? animal.age === filtro.edad : true;
-      return coincideBusqueda && coincideUbicacion && coincideTipo && coincideEdad;
-    })
-    .sort((a, b) => {
-      if (ordenar === 'reciente') {
-        return new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime();
-      } else if (ordenar === 'masAdoptados') {
-        return b.adoptionCount - a.adoptionCount;
-      }
-      return 0;
-    });
+  const animalesCoincidencia = animales.filter(animal => {
+    if (busqueda === "") {
+      return animal
+    }
+
+    if (animal.nombre.toLowerCase().includes(busqueda.toLocaleLowerCase())) {
+      return animal
+    }
+
+  })
 
   return (
     <div>
       <h2>Animales Disponibles para Adopción</h2>
-      <input type="text" placeholder="Buscar por nombre" value={busqueda} onChange={manejarCambioBusqueda} />
-      <div>
-        <input
-          type="text"
-          name="ubicacion"
-          placeholder="Ubicación"
-          value={filtro.ubicacion}
-          onChange={manejarCambioFiltro}
-        />
-        <input
-          type="text"
-          name="tipo"
-          placeholder="Tipo de animal"
-          value={filtro.tipo}
-          onChange={manejarCambioFiltro}
-        />
-        <input
-          type="text"
-          name="edad"
-          placeholder="Edad"
-          value={filtro.edad}
-          onChange={manejarCambioFiltro}
-        />
-      </div>
-      <div>
-        {animalesFiltrados.map(animal => (
-          <div key={animal.id}>
-            <img src={animal.photo} alt={animal.name} width="100" />
-            <h3>{animal.name}</h3>
-            <p>Ubicación: {animal.location}</p>
-            <p>Edad: {animal.age}</p>
-            <p>Estado de salud: {animal.healthStatus}</p>
-            <p>{animal.adopted ? 'Ya adoptado' : 'Disponible para adopción'}</p>
+      <input
+        type="text"
+        placeholder="Buscar por nombre"
+        value={busqueda}
+        style={{ height: "35px", width: "400px", borderRadius: "5px" }}
+        onChange={manejarCambioBusqueda} />
+  
+      <div style={{ display: "flex" , flexDirection: "column", gap: "10px", marginTop: "10px"}}>
+
+        {animalesCoincidencia.length === 0 && (
+          <h3>No hay animales.</h3>
+        )}
+        {animalesCoincidencia.map((animal, index) => (
+          <div key={index} style={{ background: "grey", color: "white",borderRadius: "15px", padding: "10px" }}>
+            <h3>{animal.nombre}</h3>
+            <p>Tipo: {animal.tipo}</p>
+            <p>Raza: {animal.raza}</p>
+            <p>Ubicación: {animal.ubicacion}</p>
+            <p>Estado de salud: {animal.estadoSalud}</p>
           </div>
         ))}
       </div>
