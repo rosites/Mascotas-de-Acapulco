@@ -13,7 +13,7 @@ const PerfilAnimal = () => {
 
   useEffect(() => {
     const obtenerAnimales = async () => {
-      const listaDeAnimales = JSON.parse(window.localStorage.getItem("reporte"))
+      const listaDeAnimales = JSON.parse(window.localStorage.getItem("reporte")) || []
       setAnimales(listaDeAnimales)
     };
     obtenerAnimales();
